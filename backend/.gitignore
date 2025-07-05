@@ -34,4 +34,4 @@ lerna-debug.log*
 
 /src/generated/prisma
 
-wrangler.jsonc
+backend/wrangler.jsonc
