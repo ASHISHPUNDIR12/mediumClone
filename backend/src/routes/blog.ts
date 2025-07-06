@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import { PrismaClient } from "../generated/prisma/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { verify } from "hono/jwt";
-import { auth } from "hono/utils/basic-auth";
 import { createBlogInput, updateBlogInput } from "@ashu777/medium-common";
 
 type MyHonoEnv = {
@@ -20,7 +19,7 @@ export const blogRouter = new Hono<MyHonoEnv>();
 // middleware for authcheck
 blogRouter.use("/*", async (c, next) => {
   const authHeader = c.req.header("authorization") || "";
-  //   const token = authHeader.split(" ")[1];
+  //   const token = authHeader.split(" ")[1]; 
 
   try {
     const response = await verify(authHeader, c.env.JWT_SECRET);

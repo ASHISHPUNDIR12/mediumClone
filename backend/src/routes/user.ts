@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { PrismaClient } from "../generated/prisma/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
-import { sign, verify } from "hono/jwt";
+import { sign } from "hono/jwt";
 import { signinInput, signupInput } from "@ashu777/medium-common";
 
 export const userRouter = new Hono<{
@@ -19,7 +19,7 @@ userRouter.post("/signup", async (c) => {
   }).$extends(withAccelerate());
 
   const body = await c.req.json();
-
+// zod validation 
   const { success } = signupInput.safeParse(body);
 
   if (!success) {
