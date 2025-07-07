@@ -6,7 +6,7 @@ import Blogs from './pages/Blogs'
 import Publish from './pages/Publish'
 import LandingPage from './pages/LandingPage'
 import ProtectedRoute from './components/ProtectedRoutes'
-import Signup from './pages/signup'
+import Signup from './pages/Signup'
 
 function App() {
 
@@ -16,7 +16,7 @@ function App() {
       <BrowserRouter>
       <Routes>
         <Route path='/' element={<LandingPage />} />
-        <Route path='/signup' element={<Signup />} />
+        <Route path='/signup' element={<Signup/>} />
         <Route path='/signin' element={<Signin />} />
         
         {/* Protected Routes */}
