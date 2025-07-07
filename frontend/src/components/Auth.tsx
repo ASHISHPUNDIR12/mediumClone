@@ -6,6 +6,7 @@ import { BACKEND_URL } from "../config";
 
 const Auth = ({ type }: { type: "signup" | "signin" }) => {
   const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
   const [postInputs, setPostInputs] = useState<SignupInput>({
     email: "",
     password: "",
@@ -13,15 +14,30 @@ const Auth = ({ type }: { type: "signup" | "signin" }) => {
   });
 
   async function sendRequest() {
+    if (
+      !postInputs.email ||
+      !postInputs.password ||
+      (type === "signup" && !postInputs.name)
+    ) {
+      setError("Please fill in all required fields.");
+      return;
+    }
     try {
+      setError(null);
       const response = await axios.post(
-        `${BACKEND_URL}/api/v1/user/${type === "signup" ? "signup" : "signin"}` ,postInputs
+        `${BACKEND_URL}/api/v1/user/${type === "signup" ? "signup" : "signin"}`,
+        postInputs
       );
-      const jwt = response.data;
+      const jwt = response.data.jwt;
+      console.log(jwt);
       localStorage.setItem("token", jwt);
-      navigate("/blog");
-    } catch (e) {
-      console.error(e);
+      navigate("/blogs");
+    } catch (e: any) {
+      if (e.response?.data?.message) {
+        setError(e.response.data.message);
+      } else {
+        setError("Something went wrong please again");
+      }
     }
   }
 
@@ -40,29 +56,31 @@ const Auth = ({ type }: { type: "signup" | "signin" }) => {
         </Link>
       </div>
 
+      <LabelInput
+        type={"email"}
+        title="Email"
+        placeholder="Enter your email"
+        onchange={(e) => {
+          setPostInputs({
+            ...postInputs,
+            email: e.target.value,
+          });
+        }}
+      />
+
       {type === "signup" ? (
         <LabelInput
-          type={"email"}
-          title="Email"
-          placeholder="Enter your email"
+          title="Name"
+          placeholder="Enter your name"
           onchange={(e) => {
             setPostInputs({
               ...postInputs,
-              email: e.target.value,
+              name: e.target.value,
             });
           }}
         />
       ) : null}
-      <LabelInput
-        title="Name"
-        placeholder="Enter your name"
-        onchange={(e) => {
-          setPostInputs({
-            ...postInputs,
-            name: e.target.value,
-          });
-        }}
-      />
+
       <LabelInput
         type={"password"}
         title="Password"
@@ -74,7 +92,11 @@ const Auth = ({ type }: { type: "signup" | "signin" }) => {
           });
         }}
       />
-      <button onClick={sendRequest} className="bg-black hover:bg-gray-600 text-white font-bold py-2 px-10 mt-5 rounded">
+      {error && <div className="text-red-500 text-sm mt-3">{error}</div>}
+      <button
+        onClick={sendRequest}
+        className="bg-black hover:bg-gray-600 text-white font-bold py-2 px-10 mt-5 rounded"
+      >
         {type === "signup" ? "Sign up" : "Sign in"}
       </button>
     </div>
