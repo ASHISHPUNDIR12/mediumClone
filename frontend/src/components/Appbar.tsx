@@ -23,7 +23,7 @@ const Appbar = () => {
          </Link>
 
           <Avatar name="Ashish" />
-          <button onClick={(e)=>{
+          <button onClick={()=>{
             localStorage.removeItem("token")
             navigate("/")
           }} className="border border-gray-300 bg-red-600 text-white p-1.5 ml-2 rounded-md text-sm font-medium hover:bg-gray-100 transition">
