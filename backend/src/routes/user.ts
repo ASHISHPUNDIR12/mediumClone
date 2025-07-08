@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { PrismaClient } from "../generated/prisma/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
-import { sign } from "hono/jwt";
+import { sign, verify } from "hono/jwt";
 import { signinInput, signupInput } from "@ashu777/medium-common";
 
 export const userRouter = new Hono<{
@@ -9,17 +9,37 @@ export const userRouter = new Hono<{
     DATABASE_URL: string;
     JWT_SECRET: string;
   };
+  Variables: {  // Fixed: was "Variable", should be "Variables"
+    userId: number;
+  };
 }>();
 
-// signup
+const authMiddleware = async (c: any, next: any) => {
+  const authHeader = c.req.header("authorization") || "";
 
+  try {
+    const response = await verify(authHeader, c.env.JWT_SECRET);
+    if (response && typeof response === "object" && "id" in response) {
+      c.set("userId", Number(response.id));
+      await next();
+    } else {
+      c.status(403);
+      return c.json({ error: "unauthorized" });
+    }
+  } catch (error) {
+    c.status(403);
+    return c.json({ error: "unauthorized" });
+  }
+};
+
+// signup
 userRouter.post("/signup", async (c) => {
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
 
   const body = await c.req.json();
-// zod validation 
+  // zod validation 
   const { success } = signupInput.safeParse(body);
 
   if (!success) {
@@ -48,6 +68,7 @@ userRouter.post("/signup", async (c) => {
       data: {
         email: body.email,
         password: body.password,
+        name: body.name, // Added: Include name field from request body
       },
     });
 
@@ -64,6 +85,7 @@ userRouter.post("/signup", async (c) => {
     });
   }
 });
+
 // signin
 userRouter.post("/signin", async (c) => {
   const prisma = new PrismaClient({
@@ -79,6 +101,7 @@ userRouter.post("/signin", async (c) => {
       message: "inputs not correct",
     });
   }
+  
   const user = await prisma.user.findUnique({
     where: {
       email: body.email,
@@ -97,4 +120,42 @@ userRouter.post("/signin", async (c) => {
     msg: "signin successful",
     jwt: jwt,
   });
+});
+
+// me 
+userRouter.get("/me", authMiddleware, async (c) => {
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+  const userId = c.get("userId") as number;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+
+    if (!user) {
+      c.status(404);
+      return c.json({ error: "User not found" });
+    }
+
+    return c.json({
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    c.status(500);
+    return c.json({ error: "Internal server error" });
+  }
 });
