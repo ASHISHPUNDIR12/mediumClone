@@ -18,8 +18,8 @@ const FullBlock = ({ blog }: { blog: Blog }) => {
         </div>
         <div className="w-full md:w-72 bg-white border border-gray-200 rounded-xl shadow-md p-6 flex flex-col items-center gap-4 self-start">
           <div className="text-xs uppercase tracking-wider text-slate-400 mb-2">Author</div>
-          <Avatar name={user?.name && user.name.trim() !== "" ? user?.name : "Anonymous"} />
-          <div className="font-extrabold text-lg text-gray-800 mt-2">{user?.name || "Anonymous"}</div>
+          <Avatar name={blog.author.name && blog.author.name.trim() !== "" ? blog.author.name : "Anonymous"} />
+          <div className="font-extrabold text-lg text-gray-800 mt-2">{blog.author.name || "Anonymous"}</div>
           <div className="text-sm text-slate-500 text-center mt-1">
             Random catch phrase about the author's ability to grab the user's attention
           </div>
