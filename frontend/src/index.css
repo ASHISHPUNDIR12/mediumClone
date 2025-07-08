@@ -9,3 +9,7 @@ body {
   background-color: #f9f9f9; /* optional: clean background */
   color: #1a1a1a; /* optional: readable text */
 }
+
+html, body, #root {
+  width: 100%;
+}

@@ -1,39 +1,38 @@
 import Appbar from "../components/Appbar";
 import BlogCard from "../components/BlogCard";
-import { useBlogs } from "../hooks";
+import { useBlogs, useUser } from "../hooks";
 import Skeleton from "../components/Skeleton";
 
 const Blogs = () => {
   const { loading, blogs } = useBlogs();
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-200">
-        <Appbar />
-        <div className="flex flex-col items-center px-2 sm:px-4 md:px-8 lg:px-0 max-w-2xl mx-auto w-full mt-10">
-          <Skeleton />
-          <Skeleton />
-          <Skeleton />
-        </div>
-      </div>
-    );
-  }
+  const { user } = useUser();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-200">
-      <Appbar />
-      <div className="flex flex-col items-center px-2 sm:px-4 md:px-8 lg:px-0 max-w-2xl mx-auto w-full">
-        {blogs.map((blog) => {
-          return (
-            <div className="w-full flex flex-col justify-center items-center mt-10 sm:mt-8 md:mt-6 lg:mt-8">
+      {/* Appbar should be outside the constrained content */}
+      <Appbar authorName={user?.name || "Anonymous"} />
+
+      {/* Blog content - more responsive container */}
+      <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 mt-6 sm:mt-8 md:mt-10">
+        {loading ? (
+          <>
+            <Skeleton />
+            <Skeleton />
+            <Skeleton />
+          </>
+        ) : (
+          blogs.map((blog) => (
+            <div key={blog.id} className="w-full mb-4 sm:mb-6 md:mb-8">
               <BlogCard
                 id={blog.id}
-                authorName={blog.author?.name || "Anomys"}
+                authorName={blog.author.name || "Anonymous"}
                 title={blog.title}
                 content={blog.content}
                 publishDate="06-06-2025"
               />
             </div>
-          );
-        })}
+          ))
+        )}
       </div>
     </div>
   );
