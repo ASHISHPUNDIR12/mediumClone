@@ -3,8 +3,10 @@ import Appbar from "../components/Appbar";
 import { BACKEND_URL } from "../config";
 import { useState, type ChangeEvent } from "react";
 import {  useNavigate } from "react-router-dom";
+import { useUser } from "../hooks";
 
 const Publish = () => {
+  const {user} = useUser()
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -12,7 +14,7 @@ const Publish = () => {
   return (
     <div className="">
       <div>
-        <Appbar />
+        <Appbar authorName={user?.name || "Anonymous"}    />
       </div>
       <div className=" w-full  flex justify-center mt-10 ">
         <div className="w-80 ">
