@@ -9,7 +9,7 @@ export const userRouter = new Hono<{
     DATABASE_URL: string;
     JWT_SECRET: string;
   };
-  Variables: {  // Fixed: was "Variable", should be "Variables"
+  Variables: {  
     userId: number;
   };
 }>();
